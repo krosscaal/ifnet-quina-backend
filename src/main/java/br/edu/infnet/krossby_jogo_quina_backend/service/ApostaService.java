@@ -11,6 +11,7 @@ import br.edu.infnet.krossby_jogo_quina_backend.model.dto.ApostaDTO;
 import br.edu.infnet.krossby_jogo_quina_backend.model.entity.Aposta;
 import br.edu.infnet.krossby_jogo_quina_backend.repository.ApostaRepository;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,8 +117,8 @@ public class ApostaService implements ServiceBase<ApostaDTO, UUID> {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ApostaDTO> listar(Pageable pageable) {
-        return List.of();
+    public Page<ApostaDTO> listar(Pageable pageable) {
+        return apostaRepository.findAll(pageable).map(this::entidadeToDto);
     }
 
 }
