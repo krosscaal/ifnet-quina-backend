@@ -30,7 +30,7 @@ public class Aposta extends EntidadeBase{
             foreignKey = @ForeignKey(name = "fk_quina_usuario"))
     private Usuario usuario;
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 200)
     private String numeroAposta;
 
     @Column(nullable = false, length = 15)

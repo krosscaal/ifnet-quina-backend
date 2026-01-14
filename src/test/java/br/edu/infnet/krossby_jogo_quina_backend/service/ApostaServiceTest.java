@@ -28,6 +28,9 @@ class ApostaServiceTest {
     
     @InjectMocks
     private ApostaService apostaService;
+
+    @Mock
+    private UsuarioService usuarioService;
     
     @Mock
     private ApostaRepository apostaRepository;
@@ -35,12 +38,12 @@ class ApostaServiceTest {
     private Usuario usuario;
     private ApostaDTO apostaDTO;
     private Aposta apostaEntidade;
-    
+
     @BeforeEach
     void setUp() {
         usuario = this.criarUsuario();
         List<String> aposta = Arrays.asList("15", "01", "23", "10", "07");
-        apostaDTO = new ApostaDTO(null, usuario, aposta,"8580", LocalDate.now(), TipoJogo.QUINA);
+        apostaDTO = new ApostaDTO(null, usuario.getId(), aposta,"8580", LocalDate.now(), TipoJogo.QUINA);
         String apostaTratada = Utils.ordenarArrayListaToString(aposta);
         apostaEntidade = this.criarAposta();
         apostaEntidade.setNumeroAposta(apostaTratada);
@@ -50,11 +53,12 @@ class ApostaServiceTest {
     @Test
     @DisplayName("Salvar Aposta")
     void incluirTest() {
+        when(usuarioService.buscarUsuarioPorId(any())).thenReturn(usuario);
         when(apostaRepository.save(any())).thenReturn(apostaEntidade);
         ApostaDTO response = apostaService.salvar(apostaDTO);
         assertNotNull(response);
         assertNotNull(response.id());
-        assertEquals(usuario.getId(), response.usuario().getId());
+        assertEquals(usuario.getId(), response.usuarioId());
         assertEquals("8580", response.numeroJogo());
         assertEquals(List.of("01", "07", "10", "15", "23"), response.aposta());
     }
@@ -62,7 +66,7 @@ class ApostaServiceTest {
     @DisplayName("BusinessException -> Aposta precisa ser informada!")
     void salvarTest_ApostaVazia() {
         List<String> aposta = List.of();
-        apostaDTO = new ApostaDTO(null, usuario, aposta,"8580", LocalDate.now(), TipoJogo.QUINA);
+        apostaDTO = new ApostaDTO(null, UUID.randomUUID(), aposta,"8580", LocalDate.now(), TipoJogo.QUINA);
         BusinessException businessException = assertThrows(BusinessException.class, () -> apostaService.salvar(apostaDTO));
         assertEquals("APOSTA PRECISA SER INFORMADA!", businessException.getMessage());
 
@@ -71,7 +75,7 @@ class ApostaServiceTest {
     @DisplayName("BusinessException -> Aposta sem quantidade de números requerida!")
     void salvarTest_ApostaInvalida() {
         List<String> aposta = List.of("01", "07", "10", "15");
-        apostaDTO = new ApostaDTO(null, usuario, aposta,"8580", LocalDate.now(), TipoJogo.QUINA);
+        apostaDTO = new ApostaDTO(null, UUID.randomUUID(), aposta,"8580", LocalDate.now(), TipoJogo.QUINA);
         BusinessException businessException = assertThrows(BusinessException.class, () -> apostaService.salvar(apostaDTO));
         assertEquals("APOSTA SEM QUANTIDADE DE NUMEROS REQUERIDA!", businessException.getMessage());
 
@@ -80,7 +84,7 @@ class ApostaServiceTest {
     @DisplayName("BusinessException -> Data de Jogo precisa ser informada!")
     void salvarTest_ApostaInvalida_semDataJogo() {
         List<String> aposta = Arrays.asList("15", "01", "23", "10", "07");
-        apostaDTO = new ApostaDTO(null, usuario, aposta,"8580", null, TipoJogo.QUINA);
+        apostaDTO = new ApostaDTO(null, UUID.randomUUID(), aposta,"8580", null, TipoJogo.QUINA);
         BusinessException businessException = assertThrows(BusinessException.class, () -> apostaService.salvar(apostaDTO));
         assertEquals("DATA DE JOGO PRECISA SER INFORMADA!", businessException.getMessage());
 
@@ -89,7 +93,7 @@ class ApostaServiceTest {
     @DisplayName("BusinessException -> Tipo de Jogo precisa ser informado!")
     void salvarTest_ApostaInvalida_semTipoJogo() {
         List<String> aposta = Arrays.asList("15", "01", "23", "10", "07");
-        apostaDTO = new ApostaDTO(null, usuario, aposta,"8580", LocalDate.now(), null);
+        apostaDTO = new ApostaDTO(null, UUID.randomUUID(), aposta,"8580", LocalDate.now(), null);
         BusinessException businessException = assertThrows(BusinessException.class, () -> apostaService.salvar(apostaDTO));
         assertEquals("TIPO DE JOGO PRECISA SER INFORMADO!", businessException.getMessage());
 
@@ -98,7 +102,7 @@ class ApostaServiceTest {
     @DisplayName("BusinessException -> Número de Jogo precisa ser informado!")
     void salvarTest_ApostaInvalida_semNumeroJogo() {
         List<String> aposta = Arrays.asList("15", "01", "23", "10", "07");
-        apostaDTO = new ApostaDTO(null, usuario, aposta,null, LocalDate.now(), TipoJogo.QUINA);
+        apostaDTO = new ApostaDTO(null, UUID.randomUUID(), aposta,null, LocalDate.now(), TipoJogo.QUINA);
         BusinessException businessException = assertThrows(BusinessException.class, () -> apostaService.salvar(apostaDTO));
         assertEquals("NUMERO DE JOGO PRECISA SER INFORMADO!", businessException.getMessage());
 
@@ -117,7 +121,7 @@ class ApostaServiceTest {
     @DisplayName("Alterar Aposta")
     void alterarTest() {
         List<String> aposta = Arrays.asList("03", "13", "33", "43", "53");
-        apostaDTO = new ApostaDTO(apostaEntidade.getId(), usuario, aposta,"8000", LocalDate.now(), TipoJogo.QUINA);
+        apostaDTO = new ApostaDTO(apostaEntidade.getId(), usuario.getId(), aposta,"8000", LocalDate.now(), TipoJogo.QUINA);
 
         Aposta apostaPersistida = Aposta.builder()
                 .usuario(apostaEntidade.getUsuario())
@@ -134,7 +138,7 @@ class ApostaServiceTest {
         assertNotNull(response);
         assertNotNull(response.id());
         assertEquals(apostaEntidade.getId(), response.id());
-        assertEquals(usuario.getId(), response.usuario().getId());
+        assertEquals(usuario.getId(), response.usuarioId());
         assertEquals("8000", response.numeroJogo());
         assertEquals(List.of("03", "13", "33", "43", "53"), response.aposta());
     }
@@ -147,7 +151,7 @@ class ApostaServiceTest {
         assertNotNull(response);
         assertNotNull(response.id());
         assertEquals(apostaEntidade.getId(), response.id());
-        assertEquals(usuario.getId(), response.usuario().getId());
+        assertEquals(usuario.getId(), response.usuarioId());
         assertEquals("8580", response.numeroJogo());
         assertEquals(List.of("01", "07", "10", "15", "23"), response.aposta());
     }

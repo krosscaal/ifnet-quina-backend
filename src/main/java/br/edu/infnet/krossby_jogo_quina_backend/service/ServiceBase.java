@@ -5,16 +5,11 @@
 
 package br.edu.infnet.krossby_jogo_quina_backend.service;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface ServiceBase<T, ID> {
     T salvar(T objeto);
-    T alterar(ID idObjeto, T objeto);
     T buscarPorId(ID id);
+    T alterar(ID idObjeto, T objeto);
     void remover(ID id);
-    Page<T> listar(Pageable pageable);
 
 }
