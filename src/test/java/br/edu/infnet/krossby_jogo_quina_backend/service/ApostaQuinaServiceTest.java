@@ -1,6 +1,6 @@
 package br.edu.infnet.krossby_jogo_quina_backend.service;
 
-import br.edu.infnet.krossby_jogo_quina_backend.Utils;
+import br.edu.infnet.krossby_jogo_quina_backend.util.GeralUtils;
 import br.edu.infnet.krossby_jogo_quina_backend.exception.BusinessException;
 import br.edu.infnet.krossby_jogo_quina_backend.model.dto.ApostaDTO;
 import br.edu.infnet.krossby_jogo_quina_backend.model.entity.Aposta;
@@ -24,10 +24,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-class ApostaServiceTest {
+class ApostaQuinaServiceTest {
     
     @InjectMocks
-    private ApostaService apostaService;
+    private ApostaQuinaService apostaQuinaService;
 
     @Mock
     private UsuarioService usuarioService;
@@ -44,7 +44,7 @@ class ApostaServiceTest {
         usuario = this.criarUsuario();
         List<String> aposta = Arrays.asList("15", "01", "23", "10", "07");
         apostaDTO = new ApostaDTO(null, usuario.getId(), aposta,"8580", LocalDate.now(), TipoJogo.QUINA);
-        String apostaTratada = Utils.ordenarArrayListaToString(aposta);
+        String apostaTratada = GeralUtils.ordenarArrayListaToString(aposta);
         apostaEntidade = this.criarAposta();
         apostaEntidade.setNumeroAposta(apostaTratada);
         apostaEntidade.setId(UUID.randomUUID());
@@ -55,7 +55,7 @@ class ApostaServiceTest {
     void incluirTest() {
         when(usuarioService.buscarUsuarioPorId(any())).thenReturn(usuario);
         when(apostaRepository.save(any())).thenReturn(apostaEntidade);
-        ApostaDTO response = apostaService.salvar(apostaDTO);
+        ApostaDTO response = apostaQuinaService.salvar(apostaDTO);
         assertNotNull(response);
         assertNotNull(response.id());
         assertEquals(usuario.getId(), response.usuarioId());
@@ -67,7 +67,7 @@ class ApostaServiceTest {
     void salvarTest_ApostaVazia() {
         List<String> aposta = List.of();
         apostaDTO = new ApostaDTO(null, UUID.randomUUID(), aposta,"8580", LocalDate.now(), TipoJogo.QUINA);
-        BusinessException businessException = assertThrows(BusinessException.class, () -> apostaService.salvar(apostaDTO));
+        BusinessException businessException = assertThrows(BusinessException.class, () -> apostaQuinaService.salvar(apostaDTO));
         assertEquals("APOSTA PRECISA SER INFORMADA!", businessException.getMessage());
 
     }
@@ -76,7 +76,7 @@ class ApostaServiceTest {
     void salvarTest_ApostaInvalida() {
         List<String> aposta = List.of("01", "07", "10", "15");
         apostaDTO = new ApostaDTO(null, UUID.randomUUID(), aposta,"8580", LocalDate.now(), TipoJogo.QUINA);
-        BusinessException businessException = assertThrows(BusinessException.class, () -> apostaService.salvar(apostaDTO));
+        BusinessException businessException = assertThrows(BusinessException.class, () -> apostaQuinaService.salvar(apostaDTO));
         assertEquals("APOSTA SEM QUANTIDADE DE NUMEROS REQUERIDA!", businessException.getMessage());
 
     }
@@ -85,7 +85,7 @@ class ApostaServiceTest {
     void salvarTest_ApostaInvalida_semDataJogo() {
         List<String> aposta = Arrays.asList("15", "01", "23", "10", "07");
         apostaDTO = new ApostaDTO(null, UUID.randomUUID(), aposta,"8580", null, TipoJogo.QUINA);
-        BusinessException businessException = assertThrows(BusinessException.class, () -> apostaService.salvar(apostaDTO));
+        BusinessException businessException = assertThrows(BusinessException.class, () -> apostaQuinaService.salvar(apostaDTO));
         assertEquals("DATA DE JOGO PRECISA SER INFORMADA!", businessException.getMessage());
 
     }
@@ -94,7 +94,7 @@ class ApostaServiceTest {
     void salvarTest_ApostaInvalida_semTipoJogo() {
         List<String> aposta = Arrays.asList("15", "01", "23", "10", "07");
         apostaDTO = new ApostaDTO(null, UUID.randomUUID(), aposta,"8580", LocalDate.now(), null);
-        BusinessException businessException = assertThrows(BusinessException.class, () -> apostaService.salvar(apostaDTO));
+        BusinessException businessException = assertThrows(BusinessException.class, () -> apostaQuinaService.salvar(apostaDTO));
         assertEquals("TIPO DE JOGO PRECISA SER INFORMADO!", businessException.getMessage());
 
     }
@@ -103,7 +103,7 @@ class ApostaServiceTest {
     void salvarTest_ApostaInvalida_semNumeroJogo() {
         List<String> aposta = Arrays.asList("15", "01", "23", "10", "07");
         apostaDTO = new ApostaDTO(null, UUID.randomUUID(), aposta,null, LocalDate.now(), TipoJogo.QUINA);
-        BusinessException businessException = assertThrows(BusinessException.class, () -> apostaService.salvar(apostaDTO));
+        BusinessException businessException = assertThrows(BusinessException.class, () -> apostaQuinaService.salvar(apostaDTO));
         assertEquals("NUMERO DE JOGO PRECISA SER INFORMADO!", businessException.getMessage());
 
     }
@@ -112,7 +112,7 @@ class ApostaServiceTest {
     void salvarTest_ApostaInvalida_semUsuario() {
         List<String> aposta = Arrays.asList("15", "01", "23", "10", "07");
         apostaDTO = new ApostaDTO(null, null, aposta,"8580", LocalDate.now(), TipoJogo.QUINA);
-        BusinessException businessException = assertThrows(BusinessException.class, () -> apostaService.salvar(apostaDTO));
+        BusinessException businessException = assertThrows(BusinessException.class, () -> apostaQuinaService.salvar(apostaDTO));
         assertEquals("USUARIO PRECISA SER INFORMADO!", businessException.getMessage());
 
     }
@@ -125,7 +125,7 @@ class ApostaServiceTest {
 
         Aposta apostaPersistida = Aposta.builder()
                 .usuario(apostaEntidade.getUsuario())
-                .numeroAposta(Utils.ordenarArrayListaToString(aposta))
+                .numeroAposta(GeralUtils.ordenarArrayListaToString(aposta))
                 .numeroJogo("8000")
                 .dataJogo(apostaEntidade.getDataJogo())
                 .tipoJogo(apostaEntidade.getTipoJogo())
@@ -134,7 +134,7 @@ class ApostaServiceTest {
 
         when(apostaRepository.findById(any())).thenReturn(Optional.ofNullable(apostaEntidade));
         when(apostaRepository.save(any())).thenReturn(apostaPersistida);
-        ApostaDTO response = apostaService.alterar(apostaEntidade.getId(), apostaDTO);
+        ApostaDTO response = apostaQuinaService.alterar(apostaEntidade.getId(), apostaDTO);
         assertNotNull(response);
         assertNotNull(response.id());
         assertEquals(apostaEntidade.getId(), response.id());
@@ -147,7 +147,7 @@ class ApostaServiceTest {
     @DisplayName("Buscar Aposta")
     void buscarPorIdTest() {
         when(apostaRepository.findById(any())).thenReturn(Optional.ofNullable(apostaEntidade));
-        ApostaDTO response = apostaService.buscarPorId(apostaEntidade.getId());
+        ApostaDTO response = apostaQuinaService.buscarPorId(apostaEntidade.getId());
         assertNotNull(response);
         assertNotNull(response.id());
         assertEquals(apostaEntidade.getId(), response.id());
@@ -160,14 +160,14 @@ class ApostaServiceTest {
     void buscarPorIdTest_naoEncontrado() {
         UUID id = UUID.randomUUID();
         when(apostaRepository.findById(any())).thenReturn(Optional.empty());
-        NoSuchElementException noSuchElementException = assertThrows(NoSuchElementException.class, () -> apostaService.buscarPorId(id));
+        NoSuchElementException noSuchElementException = assertThrows(NoSuchElementException.class, () -> apostaQuinaService.buscarPorId(id));
         assertEquals("Não existe aposta com o id: ".concat(String.valueOf(id)), noSuchElementException.getMessage());
     }
     @Test
     @DisplayName("Remover Aposta")
     void removerTest() {
         when(apostaRepository.findById(any())).thenReturn(Optional.ofNullable(apostaEntidade));
-        apostaService.remover(apostaEntidade.getId());
+        apostaQuinaService.remover(apostaEntidade.getId());
         verify(apostaRepository).deleteById(apostaEntidade.getId());
     }
 

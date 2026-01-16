@@ -7,7 +7,7 @@ package br.edu.infnet.krossby_jogo_quina_backend.resource;
 
 import br.edu.infnet.krossby_jogo_quina_backend.exception.BusinessException;
 import br.edu.infnet.krossby_jogo_quina_backend.model.dto.ApostaDTO;
-import br.edu.infnet.krossby_jogo_quina_backend.service.ApostaService;
+import br.edu.infnet.krossby_jogo_quina_backend.service.ApostaQuinaService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,37 +20,37 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/aposta")
-public class ApostaResource extends ResourceBase<ApostaDTO, UUID>{
+public class ApostaQuinaResource extends ResourceBase<ApostaDTO, UUID>{
 
-    private final ApostaService apostaService;
+    private final ApostaQuinaService apostaQuinaService;
 
-    public ApostaResource(ApostaService apostaService) {
-        this.apostaService = apostaService;
+    public ApostaQuinaResource(ApostaQuinaService apostaQuinaService) {
+        this.apostaQuinaService = apostaQuinaService;
     }
 
     @Override
     protected ResponseEntity<ApostaDTO> acaoIncluir(ApostaDTO dto) throws BusinessException {
-        return new ResponseEntity<>(apostaService.salvar(dto), HttpStatus.CREATED);
+        return new ResponseEntity<>(apostaQuinaService.salvar(dto), HttpStatus.CREATED);
     }
 
     @Override
     protected ResponseEntity<ApostaDTO> acaoObterPorId(UUID uuid) throws BusinessException {
-        return ResponseEntity.ok(apostaService.buscarPorId(uuid));
+        return ResponseEntity.ok(apostaQuinaService.buscarPorId(uuid));
     }
 
     @Override
     protected ResponseEntity<ApostaDTO> acaoAlterar(UUID uuid, ApostaDTO dto) throws BusinessException {
-        return ResponseEntity.ok(apostaService.alterar(uuid, dto));
+        return ResponseEntity.ok(apostaQuinaService.alterar(uuid, dto));
     }
 
     @Override
     protected void acaoExcluir(UUID uuid) throws BusinessException {
-        apostaService.remover(uuid);
+        apostaQuinaService.remover(uuid);
     }
     @GetMapping(value = "/buscar", produces = {"application/json"})
     public Page<ApostaDTO> acaoBuscar(
             @RequestParam(required = false, defaultValue = "0") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size) {
-        return apostaService.buscar(page, size);
+        return apostaQuinaService.buscar(page, size);
     }
 }

@@ -5,7 +5,8 @@
 
 package br.edu.infnet.krossby_jogo_quina_backend.service;
 
-import br.edu.infnet.krossby_jogo_quina_backend.Utils;
+import br.edu.infnet.krossby_jogo_quina_backend.exception.NaoEncontradoException;
+import br.edu.infnet.krossby_jogo_quina_backend.util.GeralUtils;
 import br.edu.infnet.krossby_jogo_quina_backend.exception.BusinessException;
 import br.edu.infnet.krossby_jogo_quina_backend.model.dto.ApostaDTO;
 import br.edu.infnet.krossby_jogo_quina_backend.model.entity.Aposta;
@@ -20,16 +21,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import static br.edu.infnet.krossby_jogo_quina_backend.util.CentroDeMensagens.*;
+
 @Service
-public class ApostaService implements ServiceBase<ApostaDTO, UUID> {
+public class ApostaQuinaService implements ServiceBase<ApostaDTO, UUID> {
 
     private final ApostaRepository apostaRepository;
     private final UsuarioService usuarioService;
 
-    public ApostaService(ApostaRepository apostaRepository, UsuarioService usuarioService) {
+    public ApostaQuinaService(ApostaRepository apostaRepository, UsuarioService usuarioService) {
         this.apostaRepository = apostaRepository;
         this.usuarioService = usuarioService;
     }
@@ -64,29 +66,24 @@ public class ApostaService implements ServiceBase<ApostaDTO, UUID> {
     }
 
     private String tratarAposta(List<String> aposta) {
-        return Utils.ordenarArrayListaToString(aposta);
+        aposta.forEach(elemento -> {
+            if (GeralUtils.contemNumeros(elemento)) {
+                throw new BusinessException("campo aposta: ".concat(DEVE_CONTER_SOMENTE_NUMEROS));
+            }
+        });
+        return GeralUtils.ordenarArrayListaToString(aposta);
     }
 
     private void validarAposta(ApostaDTO objeto) {
         if (objeto.aposta() == null || objeto.aposta().isEmpty()) {
-            throw new BusinessException("Aposta precisa ser informada!");
+            throw new BusinessException("campo aposta: ".concat(APOSTA_PRECISA_SER_INFORMADA));
         }
         if (objeto.aposta().size() != 5) {
-            throw new BusinessException("Aposta sem quantidade de numeros requerida!");
+            throw new BusinessException("campo aposta:".concat(FALTA_NUMEROS_EM_APOSTA));
         }
-        if (objeto.dataJogo() == null) {
-            throw new BusinessException("Data de Jogo precisa ser informada!");
+        if (GeralUtils.contemNumeros(objeto.numeroJogo())) {
+            throw new BusinessException("campo numeroJogo: ".concat(DEVE_CONTER_SOMENTE_NUMEROS));
         }
-        if (objeto.tipoJogo() == null) {
-            throw new BusinessException("Tipo de Jogo precisa ser informado!");
-        }
-        if (objeto.numeroJogo() == null || objeto.numeroJogo().isBlank()) {
-            throw new BusinessException("Numero de Jogo precisa ser informado!");
-        }
-        if (objeto.usuarioId() == null) {
-            throw new BusinessException("usuarioId precisa ser informado!");
-        }
-
     }
 
     @Transactional(readOnly = true)
@@ -106,7 +103,7 @@ public class ApostaService implements ServiceBase<ApostaDTO, UUID> {
     }
 
     private Aposta buscarApostaPorId(UUID idObjeto) {
-        return apostaRepository.findById(idObjeto).orElseThrow(() -> new NoSuchElementException(String.format("Não existe aposta com o id: %s", idObjeto)));
+        return apostaRepository.findById(idObjeto).orElseThrow(() -> new NaoEncontradoException(String.format("Não existe aposta com o id: %s", idObjeto)));
     }
 
     @Override

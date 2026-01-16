@@ -13,16 +13,20 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import static br.edu.infnet.krossby_jogo_quina_backend.util.CentroDeMensagens.NAO_NULL;
+import static br.edu.infnet.krossby_jogo_quina_backend.util.CentroDeMensagens.NAO_VAZIO;
+
 public record ApostaDTO(
         UUID id,
-        @NotNull
+        @NotNull(message = NAO_NULL)
         UUID usuarioId,
-        @NotNull
+        @NotNull(message = NAO_NULL)
         List<String> aposta,
-        @NotBlank
+        @NotNull(message = NAO_NULL)
+        @NotBlank(message = NAO_VAZIO)
         String numeroJogo,
-        @NotNull
+        @NotNull(message = NAO_NULL)
         LocalDate dataJogo,
-        @NotNull
+        @NotNull(message = NAO_NULL)
         TipoJogo tipoJogo) {
 }
