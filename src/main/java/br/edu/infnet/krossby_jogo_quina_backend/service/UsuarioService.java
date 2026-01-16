@@ -6,15 +6,19 @@
 package br.edu.infnet.krossby_jogo_quina_backend.service;
 
 import br.edu.infnet.krossby_jogo_quina_backend.exception.BusinessException;
-import br.edu.infnet.krossby_jogo_quina_backend.exception.UsuarioException;
+import br.edu.infnet.krossby_jogo_quina_backend.exception.NaoEncontradoException;
 import br.edu.infnet.krossby_jogo_quina_backend.model.dto.UsuarioDTO;
 import br.edu.infnet.krossby_jogo_quina_backend.model.entity.Usuario;
 import br.edu.infnet.krossby_jogo_quina_backend.repository.UsuarioRepository;
+import br.edu.infnet.krossby_jogo_quina_backend.util.GeralUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+
+import static br.edu.infnet.krossby_jogo_quina_backend.util.CentroDeMensagens.E_UM_CAMPO_OBRIGATORIO;
+import static br.edu.infnet.krossby_jogo_quina_backend.util.CentroDeMensagens.FORMATO_E_MAIL_INCORRETO;
 
 @Service
 public class UsuarioService implements ServiceBase<UsuarioDTO, UUID> {
@@ -35,12 +39,13 @@ public class UsuarioService implements ServiceBase<UsuarioDTO, UUID> {
     }
 
     private UsuarioDTO entityToDto(Usuario usuarioSaved) {
-        return new UsuarioDTO(
-                usuarioSaved.getId(),
-                usuarioSaved.getNome(),
-                usuarioSaved.getEmail(),
-                "",
-                "");
+        return UsuarioDTO.builder()
+                .id(usuarioSaved.getId())
+                .nome(usuarioSaved.getNome())
+                .email(usuarioSaved.getEmail())
+                .userLogin(usuarioSaved.getUserLogin())
+                .userSenha("**********")
+                .build();
     }
 
     private Usuario dtoToEntity(UsuarioDTO objeto) {
@@ -51,17 +56,8 @@ public class UsuarioService implements ServiceBase<UsuarioDTO, UUID> {
     }
 
     private void verificarUsuario(UsuarioDTO objeto) {
-        if (objeto.nome() == null || objeto.nome().isBlank()) {
-            throw new BusinessException("Nome precisa ser informado!");
-        }
-        if (objeto.email() == null || objeto.email().isBlank()) {
-            throw new BusinessException("Email precisa ser informado!");
-        }
-        if (objeto.userLogin() == null || objeto.userLogin().isBlank()) {
-            throw new BusinessException("Login precisa ser informado!");
-        }
-        if (objeto.userSenha() == null || objeto.userSenha().isBlank()) {
-            throw new BusinessException("Senha precisa ser informada!");
+        if (!GeralUtils.emailValido(objeto.getEmail())) {
+            throw new BusinessException("campo ".concat(FORMATO_E_MAIL_INCORRETO));
         }
     }
 
@@ -89,7 +85,7 @@ public class UsuarioService implements ServiceBase<UsuarioDTO, UUID> {
     }
 
     public Usuario buscarUsuarioPorId(UUID id) {
-        return this.usuarioRepository.findById(id).orElseThrow(()-> new UsuarioException("Usuário Não Encontrado!"));
+        return this.usuarioRepository.findById(id).orElseThrow(()-> new NaoEncontradoException(String.format("Usuário com %s, não encontrado!", id)));
     }
 
 
