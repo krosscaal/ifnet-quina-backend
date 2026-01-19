@@ -5,7 +5,9 @@
 
 package br.edu.infnet.krossby_jogo_quina_backend.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import br.edu.infnet.krossby_jogo_quina_backend.model.enumerator.TipoRole;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
@@ -29,6 +31,9 @@ public class UsuarioDTO {
     private String userLogin;
     @NotBlank(message = E_UM_CAMPO_OBRIGATORIO)
     private String userSenha;
+    @NotBlank(message = E_UM_CAMPO_OBRIGATORIO)
+    @Enumerated(EnumType.STRING)
+    private TipoRole role;
 
     @Override
     public String toString() {
@@ -37,6 +42,7 @@ public class UsuarioDTO {
                 ", nome='" + nome + '\'' +
                 ", email='" + email + '\'' +
                 ", userLogin='" + userLogin + '\'' +
+                ", role=" + role +
                 '}';
     }
 }
