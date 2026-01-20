@@ -25,7 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
     private final SecurityFilter securityFilter;
-    private static final String URI_APOSTA = "/aposta";
+    private static final String URI_JOGADOR = "/jogador";
     private static final String URI_USUARIO = "/usuario";
     private static final String ROLE_USER = "USER";
     private static final String ROLE_ADMIN = "ADMIN";
@@ -46,10 +46,10 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.POST, URI_APOSTA).hasAnyRole( ROLE_ADMIN, ROLE_USER)
-                        .requestMatchers(HttpMethod.GET, URI_APOSTA.concat("/**")).hasAnyRole( ROLE_ADMIN, ROLE_USER)
-                        .requestMatchers(HttpMethod.PUT, URI_APOSTA.concat("/**")).hasAnyRole( ROLE_ADMIN, ROLE_USER)
-                        .requestMatchers(HttpMethod.DELETE, URI_APOSTA.concat("/**")).hasAnyRole( ROLE_ADMIN, ROLE_USER)
+                        .requestMatchers(HttpMethod.POST, URI_JOGADOR).hasAnyRole( ROLE_ADMIN, ROLE_USER)
+                        .requestMatchers(HttpMethod.GET, URI_JOGADOR.concat("/**")).hasAnyRole( ROLE_ADMIN, ROLE_USER)
+                        .requestMatchers(HttpMethod.PUT, URI_JOGADOR.concat("/**")).hasAnyRole( ROLE_ADMIN, ROLE_USER)
+                        .requestMatchers(HttpMethod.DELETE, URI_JOGADOR.concat("/**")).hasAnyRole( ROLE_ADMIN, ROLE_USER)
                         .requestMatchers(HttpMethod.GET, URI_USUARIO.concat("/**")).hasAnyRole( ROLE_ADMIN, ROLE_USER)
                         .requestMatchers(HttpMethod.PUT, URI_USUARIO.concat("/**")).hasAnyRole( ROLE_ADMIN, ROLE_USER)
                         .requestMatchers(HttpMethod.DELETE, URI_USUARIO.concat("/**")).hasAnyRole( ROLE_ADMIN, ROLE_USER)

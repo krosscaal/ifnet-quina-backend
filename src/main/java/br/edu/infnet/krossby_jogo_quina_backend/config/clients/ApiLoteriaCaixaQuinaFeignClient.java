@@ -30,19 +30,15 @@ public interface ApiLoteriaCaixaQuinaFeignClient {
     @JsonIgnoreProperties(ignoreUnknown = true)
     class ApiCaixaQuinaResponse {
         private String dataApuracao;
+        private String dataProximoConcurso;
+        private Integer numeroConcursoAnterior;
+        private Integer numeroConcursoProximo;
         private List<String> dezenasSorteadasOrdemSorteio;
-        private String numero;
+        private List<String> listaDezenas;
+        private Boolean acumulado;
+        private String valorEstimadoProximoConcurso;
+        private Integer numero;
         private TipoJogo tipoJogo;
 
-        @Override
-        public String toString() {
-            return "ApiCaixaQuinaResponse{" +
-                    "dataApuracao='" + dataApuracao + '\'' +
-                    ", dezenasSorteadasOrdemSorteio=" + dezenasSorteadasOrdemSorteio +
-                    ", numero='" + numero + '\'' +
-                    ", tipoJogo=" + tipoJogo +
-                    '}';
-        }
     }
-
 }
