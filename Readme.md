@@ -31,6 +31,8 @@ Este projeto é uma API REST desenvolvida para o gerenciamento (CRUD) de jogador
 Este back-end foi desenvolvido para servir à seguinte aplicação front-end:
 *   **Repositório Front-end:** [infnet-quina-frontend](https://github.com/krosscaal/infnet-quina-frontend)
 
+**Atenção:** Para testar a aplicação completamente, este projeto(back-end) assim como o projeto relacionado (front-end) devem ser inicializados simultaneamente.
+
 
 ## 🔐 Segurança
 
@@ -44,6 +46,16 @@ A segurança é tratada via **Spring Security** com uma arquitetura baseada em *
 A aplicação utiliza o **FeignClient** para se comunicar com a API de loterias. A interface `ApiLoteriaCaixaQuinaFeignClient` define os endpoints para buscar informações atualizadas diretamente dos resultados oficiais da Quina.
 // ... existing code ...
 A aplicação utiliza o **FeignClient** para se comunicar com a API de loterias. A interface `ApiLoteriaCaixaQuinaFeignClient` define os endpoints para buscar informações atualizadas diretamente dos resultados oficiais da Quina.
+
+## 🔑 Acesso Inicial
+
+Ao iniciar a aplicação pela primeira vez, um usuário padrão é criado automaticamente através do `UsuarioLoader` para facilitar o acesso inicial e os testes com a aplicação front-end:
+
+*   **E-mail:** `user@gmail.com`
+*   **Senha:** `123`
+
+Utilize estas credenciais na tela de login da aplicação relacionada para obter acesso às funcionalidades protegidas.
+
 
 ## ⚙️ Instalação e Execução
 
